@@ -1,0 +1,14 @@
+nav {
+    margin-top: 10px;
+}
+
+nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #4a148c;
+    font-weight: bold;
+}
+
+nav a:hover {
+    color: #ab47bc;
+}
