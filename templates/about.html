@@ -3,7 +3,11 @@
 {% block title %}About Us{% endblock %}
 
 {% block content %}
-<h2>About Climate Adventure</h2>
-<p>Welcome to Climate Adventure! 🌍 This website is dedicated to providing interactive tools and data visualizations about climate patterns, sea levels, and weather trends.</p>
-<p>Our mission is to raise awareness about climate change and its impacts on our planet through engaging and easy-to-understand visual content.</p>
+    <h2 class="text-center">About Climate Adventure</h2>
+    <p>
+        Welcome to Climate Adventure! This application allows you to explore weather-related data dynamically
+        from a MySQL database. You can view live global temperatures, weather patterns, and more.
+        Dive in and explore the data that shapes our world.
+    </p>
+    <a href="{{ url_for('homepage') }}" class="btn btn-primary">Back to Home</a>
 {% endblock %}

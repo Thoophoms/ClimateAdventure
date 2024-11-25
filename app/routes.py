@@ -1,4 +1,4 @@
-from flask import render_template, jsonify, request
+from flask import render_template, request, jsonify
 from app import app
 from app.database import get_db_connection
 
@@ -13,51 +13,21 @@ def about():
     return render_template('about.html')
 
 
-@app.route('/test', methods=['GET'])
-def test_connection():
-    connection = get_db_connection()
-    if connection:
-        return jsonify({"message": "Database connection successful!"}), 200
-    return jsonify({"error": "Database connection failed"}), 500
-
-
-@app.route('/locations', methods=['GET'])
-def get_locations():
+@app.route('/fetch_data', methods=['POST'])
+def fetch_data():
+    table = request.form.get('table')
     connection = get_db_connection()
     if not connection:
-        return jsonify({"error": "Database connection failed"}), 500
+        return jsonify({'error': 'Database connection failed'}), 500
 
     cursor = connection.cursor(dictionary=True)
-    query = "SELECT * FROM locations;"
-    cursor.execute(query)
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
-
-    return jsonify(results), 200
-
-
-@app.route('/add-location', methods=['POST'])
-def add_location():
-    data = request.json
-    connection = get_db_connection()
-    if not connection:
-        return jsonify({"error": "Database connection failed"}), 500
-
-    cursor = connection.cursor()
-    query = """
-        INSERT INTO locations (min_latitude, max_latitude, min_longitude, max_longitude, region, country)
-        VALUES (%s, %s, %s, %s, %s, %s);
-    """
-    values = (
-        data['min_latitude'], data['max_latitude'],
-        data['min_longitude'], data['max_longitude'],
-        data['region'], data['country']
-    )
-
-    cursor.execute(query, values)
-    connection.commit()
-    cursor.close()
-    connection.close()
-
-    return jsonify({"message": "Location added successfully!"}), 201
+    try:
+        query = f"SELECT * FROM {table};"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        return jsonify({'data': rows})
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    finally:
+        cursor.close()
+        connection.close()

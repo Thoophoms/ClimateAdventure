@@ -1,12 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Climate Adventure</title>
-</head>
-<body>
-    <h1>Welcome to Climate Adventure 🌍</h1>
-    <p>Your journey to explore climate data starts here!</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Weather Data Viewer{% endblock %}
+
+{% block content %}
+    <h2 class="text-center">Weather Data Viewer</h2>
+    <form id="tableForm" class="mt-4">
+        <label for="table">Select Table:</label>
+        <select id="table" class="form-control">
+            <option value="live_global_temp">Live Global Temperature</option>
+            <option value="live_weather_patterns">Live Weather Patterns</option>
+            <option value="locations">Locations</option>
+            <option value="monthly_global_temp">Monthly Global Temperature</option>
+            <option value="monthly_sea_levels">Monthly Sea Levels</option>
+            <option value="monthly_weather_patterns">Monthly Weather Patterns</option>
+            <option value="sea_level_log">Sea Level Log</option>
+            <option value="seas">Seas</option>
+            <option value="temp_log">Temperature Log</option>
+            <option value="weather_pattern_log">Weather Pattern Log</option>
+        </select>
+        <button type="submit" class="btn btn-primary mt-3">Fetch Data</button>
+    </form>
+    <div id="result" class="mt-4"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#tableForm').on('submit', function (e) {
+                e.preventDefault();
+                const table = $('#table').val();
+                $.post('/fetch_data', { table }, function (response) {
+                    if (response.error) {
+                        $('#result').html(`<div class="alert alert-danger">${response.error}</div>`);
+                    } else {
+                        const data = response.data;
+                        if (data.length > 0) {
+                            let tableHtml = '<table class="table table-bordered mt-3"><thead><tr>';
+                            for (const key in data[0]) {
+                                tableHtml += `<th>${key}</th>`;
+                            }
+                            tableHtml += '</tr></thead><tbody>';
+                            data.forEach(row => {
+                                tableHtml += '<tr>';
+                                for (const key in row) {
+                                    tableHtml += `<td>${row[key]}</td>`;
+                                }
+                                tableHtml += '</tr>';
+                            });
+                            tableHtml += '</tbody></table>';
+                            $('#result').html(tableHtml);
+                        } else {
+                            $('#result').html('<div class="alert alert-info">No data found.</div>');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
