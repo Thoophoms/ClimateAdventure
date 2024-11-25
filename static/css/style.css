@@ -1,0 +1,23 @@
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+header nav a {
+    color: white;
+    margin: 0 10px;
+    text-decoration: none;
+}
+
+header nav a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    font-size: 0.9rem;
+}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}About Us{% endblock %}
+
+{% block content %}
+    <h2 class="text-center">About Climate Adventure</h2>
+    <p>
+        Welcome to Climate Adventure! This application allows you to explore weather-related data dynamically
+        from a MySQL database. You can view live global temperatures, weather patterns, and more.
+        Dive in and explore the data that shapes our world.
+    </p>
+    <a href="{{ url_for('homepage') }}" class="btn btn-primary">Back to Home</a>
+{% endblock %}

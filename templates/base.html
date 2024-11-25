@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Climate Adventure{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <header class="bg-primary text-white text-center p-3">
+        <h1>Climate Adventure</h1>
+        <nav>
+            <a href="{{ url_for('homepage') }}" class="text-white mx-3">Home</a>
+            <a href="{{ url_for('about') }}" class="text-white mx-3">About</a>
+        </nav>
+    </header>
+    <main class="container my-4">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="text-center p-3 bg-light">
+        <p>&copy; 2024 Climate Adventure. All rights reserved.</p>
+    </footer>
+</body>
+</html>
