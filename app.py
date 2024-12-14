@@ -4,6 +4,7 @@ from models import (
     LiveWeatherPattern, WeatherPatternLog, WeatherImportLog, Sea, MonthlySeaLevel, SeaLevelLog
 )
 from config import Config
+from export_data import export_bp  # Import the export blueprint
 
 # Initialize Flask application
 app = Flask(__name__)
@@ -11,6 +12,9 @@ app.config.from_object(Config)
 
 # Initialize SQLAlchemy with the Flask app
 db.init_app(app)
+
+# Register Blueprint for exporting data
+app.register_blueprint(export_bp)
 
 # ------------------ API Endpoints ------------------
 
