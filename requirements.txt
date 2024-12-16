@@ -1,4 +1,9 @@
 Flask
-flask-sqlalchemy
+Flask-SQLAlchemy
 pymysql
+pandas
+matplotlib
+xlsxwriter
+reportlab
 python-dotenv
+
