@@ -314,6 +314,30 @@ def get_sea_level_log():
         return jsonify({"error": str(e)}), 500
 
 
+@app.route('/available-months', methods=['GET'])
+def available_months():
+    try:
+
+        location_id = request.args.get('location_id', type=int)
+
+        query = MonthlyGlobalTemp.query
+
+        if location_id:
+            query = query.filter_by(location_id=location_id)
+
+        months = query.with_entities(
+            MonthlyGlobalTemp.year, MonthlyGlobalTemp.month
+        ).distinct().order_by(
+            MonthlyGlobalTemp.year, MonthlyGlobalTemp.month
+        ).all()
+
+        result = [{"year": y, "month": m} for y, m in months]
+        return jsonify(result), 200
+
+    except Exception as e:
+        return jsonify({"error":str(e)}), 500
+
+
 # ------------------ Run Application ------------------
 if __name__ == '__main__':
     # Run Flask app
