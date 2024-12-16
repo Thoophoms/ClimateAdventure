@@ -338,6 +338,123 @@ def available_months():
         return jsonify({"error":str(e)}), 500
 
 
+@app.route('/geojson', methods=['GET'])
+def get_geojson():
+    try:
+        # Get query parameters
+        parameter = request.args.get('parameter', type=str)
+        month = request.args.get('month', type=int)
+        year = request.args.get('year', type=int)
+        location_id = request.args.get('location_id', type=int)
+
+        if not parameter or not month or not year:
+            return jsonify({"error": "Missing required parameters"}), 400
+
+        # Determine the data source based on the parameter
+        if parameter in ["total_precipitation", "average_wind_speed", "humidity"]:
+            model = MonthlyWeatherPattern
+            data_key = parameter
+        elif parameter in ["fahrenheit"]:
+            model = MonthlyGlobalTemp
+            data_key = parameter
+        else:
+            return jsonify({"error": "Invalid parameter"}), 400
+
+        # Query the data
+        query = db.session.query(
+            Location.min_longitude,
+            Location.min_latitude,
+            model.location_id,
+            getattr(model, data_key).label("value")
+        ).join(Location, Location.id == model.location_id
+        ).filter(model.month == month, model.year == year)
+
+        if location_id:
+            query = query.filter(model.location_id == location_id)
+
+        data = query.all()
+        if not data:
+            return jsonify({"error": "No data found"}), 404
+
+        # Generate GeoJSON
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [item.min_longitude, item.min_latitude],
+                    },
+                    "properties": {
+                        "value": item.value,
+                        "location_id": item.location_id
+                    },
+                }
+                for item in data
+            ],
+        }
+        return jsonify(geojson), 200
+    except Exception as e:
+        return jsonify({"error":str(e)}),500
+
+@app.route('/export', methods=['GET'])
+def export_data():
+    try:
+        export_format = request.args.get('format')
+        month = request.args.get('month', type=int)
+        year = request.args.get('year', type=int)
+
+        if not export_format or not month or not year:
+            return jsonify({"error": "Missing required parameters"}), 400
+
+        # Generate data for export (dummy example)
+        data = [
+            {"location": "Location A", "value": 23.5},
+            {"location": "Location B", "value": 19.2},
+        ]
+
+        if export_format == "csv":
+            from io import StringIO
+            import csv
+
+            output = StringIO()
+            writer = csv.DictWriter(output, fieldnames=["location", "value"])
+            writer.writeheader()
+            writer.writerows(data)
+            output.seek(0)
+
+            return Response(
+                output,
+                mimetype="text/csv",
+                headers={
+                    "Content-Disposition": f"attachment;filename=exported_data_{month}_{year}.csv"
+                },
+            )
+        elif export_format == "pdf":
+            from fpdf import FPDF
+
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            pdf.cell(200, 10, txt=f"Exported Data for {month}/{year}", ln=True, align="C")
+            for row in data:
+                pdf.cell(200, 10, txt=f"{row['location']}: {row['value']}", ln=True, align="L")
+
+            response = Response(
+                pdf.output(dest="S").encode("latin1"),
+                mimetype="application/pdf",
+                headers={
+                    "Content-Disposition": f"attachment;filename=exported_data_{month}_{year}.pdf"
+                },
+            )
+            return response
+
+        else:
+            return jsonify({"error": "Invalid format"}), 400
+
+    except Exception as e:
+        return jsonify({"error":str(e)}),500
 # ------------------ Run Application ------------------
 if __name__ == '__main__':
     # Run Flask app
