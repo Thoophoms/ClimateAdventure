@@ -6,4 +6,4 @@ matplotlib
 xlsxwriter
 reportlab
 python-dotenv
-
+flask-corq
