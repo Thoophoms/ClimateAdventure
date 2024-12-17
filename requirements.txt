@@ -1,2 +1,9 @@
-flask
-mysql-connector-python
+Flask
+Flask-SQLAlchemy
+pymysql
+pandas
+matplotlib
+xlsxwriter
+reportlab
+python-dotenv
+flask-corq
